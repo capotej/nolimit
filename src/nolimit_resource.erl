@@ -30,22 +30,26 @@ content_types_provided(RD, Ctx) ->
 
 
 %% hit this with
-%%   curl "http://localhost:8000/?one=two&=pope"
+%%   curl "http://localhost:8000/?key=key"
 to_json(RD, Ctx) ->
-    %Key = [[{"one","two"},{[],"pope"}]]
     [{"key",Key}] = wrq:req_qs(RD),
     [{bc, Bitcask}] = ets:lookup(my_table, bc),
-    %{Result, RD, Ctx}.
     Result = bitcask:get(Bitcask, term_to_binary(Key)),
-    if Result =:= not_found -> {"not found", RD, Ctx};
-      true -> {Result, RD, Ctx}
+    %if Result =:= not_found -> {"not found", RD, Ctx};
+    %  true -> {Result, RD, Ctx}
+    %end.
+    case Result of
+      not_found -> {"not_found", RD, Ctx};
+      {ok, Bin} -> {binary_to_term(Bin), RD, Ctx};
+      true -> {"error", RD, Ctx}
     end.
 
 %% hit this with
 %%   curl -X POST http://localhost:8000/formjson \
 %%        -d "one=two&me=pope"
 process_post(RD, Ctx) ->
-    Body = json_body(mochiweb_util:parse_qs(wrq:req_body(RD))),
-    {true, wrq:append_to_response_body(Body, RD), Ctx}.
+    [{Key,Value}] = mochiweb_util:parse_qs(wrq:req_body(RD)),
+    [{bc, Bitcask}] = ets:lookup(my_table, bc),
+    bitcask:put(Bitcask, term_to_binary(Key), term_to_binary(Value)),
+    {true, wrq:append_to_response_body("ok", RD), Ctx}.
 
-json_body(QS) -> mochijson:encode({struct, QS}).
