@@ -35,8 +35,11 @@ to_json(RD, Ctx) ->
     %Key = [[{"one","two"},{[],"pope"}]]
     [{"key",Key}] = wrq:req_qs(RD),
     [{bc, Bitcask}] = ets:lookup(my_table, bc),
+    %{Result, RD, Ctx}.
     Result = bitcask:get(Bitcask, term_to_binary(Key)),
-    {Result, RD, Ctx}.
+    if Result =:= not_found -> {"not found", RD, Ctx};
+      true -> {Result, RD, Ctx}
+    end.
 
 %% hit this with
 %%   curl -X POST http://localhost:8000/formjson \
