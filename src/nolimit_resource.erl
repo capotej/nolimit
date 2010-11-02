@@ -1,6 +1,6 @@
-%% @author author <author@example.com>
-%% @copyright YYYY author.
-%% @doc Example webmachine_resource.
+%% @author Julio Capote <jcapote@gmail.com>
+%% @copyright 2011 Julio Capote.
+%% @doc No Limit Resource
 
 -module(nolimit_resource).
 -export([
