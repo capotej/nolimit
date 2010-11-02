@@ -18,6 +18,7 @@ init(Config) ->
   Bitcask = bitcask:open("/tmp", [read_write]),
   ets:new(my_table, [named_table, protected, set, {keypos, 1}]),
   ets:insert(my_table, {bc, Bitcask}),
+  %ets:lookup(my_table, foo). -> [{bc,"Bar"}]
   {ok, Config}.
 
 allowed_methods(RD, Ctx) ->
@@ -26,10 +27,16 @@ allowed_methods(RD, Ctx) ->
 content_types_provided(RD, Ctx) ->
     {[{"application/json", to_json}], RD, Ctx}.
 
+
+
 %% hit this with
 %%   curl "http://localhost:8000/?one=two&=pope"
 to_json(RD, Ctx) ->
-    {json_body(wrq:req_qs(RD)), RD, Ctx}.
+    %Key = [[{"one","two"},{[],"pope"}]]
+    [{"key",Key}] = wrq:req_qs(RD),
+    [{bc, Bitcask}] = ets:lookup(my_table, bc),
+    Result = bitcask:get(Bitcask, term_to_binary(Key)),
+    {Result, RD, Ctx}.
 
 %% hit this with
 %%   curl -X POST http://localhost:8000/formjson \
