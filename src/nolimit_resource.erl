@@ -14,10 +14,11 @@
 -include_lib("webmachine/include/webmachine.hrl").
 -include_lib("bitcask/include/bitcask.hrl").
 
-init([]) -> 
-  %bitcask:open("/tmp", {read_write}),
-  {ok, undefined}.
-
+init(Config) -> 
+  Bitcask = bitcask:open("/tmp", [read_write]),
+  ets:new(my_table, [named_table, protected, set, {keypos, 1}]),
+  ets:insert(my_table, {bc, Bitcask}),
+  {ok, Config}.
 
 allowed_methods(RD, Ctx) ->
     {['GET', 'HEAD', 'POST'], RD, Ctx}.
@@ -26,7 +27,7 @@ content_types_provided(RD, Ctx) ->
     {[{"application/json", to_json}], RD, Ctx}.
 
 %% hit this with
-%%   curl "http://localhost:8000/formjson?one=two&me=pope"
+%%   curl "http://localhost:8000/?one=two&=pope"
 to_json(RD, Ctx) ->
     {json_body(wrq:req_qs(RD)), RD, Ctx}.
 
