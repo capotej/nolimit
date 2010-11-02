@@ -1,35 +1,20 @@
-Project Skeleton for the nolimit app.
+NoLimit
 
-You should find in this directory:
+webmachine/bitcask proof of concept for a disk backed, fast k/v cache
 
-README : this file
-Makefile : simple make commands
-rebar : the Rebar build tool for Erlang applications
-rebar.config : configuration for Rebar
-start.sh : simple startup script for running nolimit
-/ebin
-  /nolimit.app : the Erlang app specification
-/src
-  /nolimit_app.erl : base module for the Erlang application
-  /nolimit_sup.erl : OTP supervisor for the application
-  /nolimit_resource.erl : a simple example Webmachine resource
-/priv
-  /dispatch.conf : the Webmachine URL-dispatching table
-  /www : a convenient place to put your static web content
+INSTALL:
 
-You probably want to do one of a couple of things at this point:
+0) brew install erlang
+1) git clone git://github.com:capotej/nolimit.git
+2) cd nolimit
+3) make
+4) ./start.sh
 
-0. Build the skeleton application:
-   $ make
-   - or -
-   $ ./rebar compile
 
-1. Start up the skeleton application:
-   $ ./start.sh
+USAGE: 
 
-2. Change the basic application:
-   edit src/nolimit_resource.erl
+SET
+curl -X POST http://localhost:8000/ -d "foo=bar"
 
-3. Add some new resources:
-   edit src/YOUR_NEW_RESOURCE.erl
-   edit priv/dispatch.conf
+GET
+curl http://localhost:8000/?key=foo

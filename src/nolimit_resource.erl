@@ -27,26 +27,16 @@ allowed_methods(RD, Ctx) ->
 content_types_provided(RD, Ctx) ->
     {[{"application/json", to_json}], RD, Ctx}.
 
-
-
-%% hit this with
-%%   curl "http://localhost:8000/?key=key"
 to_json(RD, Ctx) ->
     [{"key",Key}] = wrq:req_qs(RD),
     [{bc, Bitcask}] = ets:lookup(my_table, bc),
     Result = bitcask:get(Bitcask, term_to_binary(Key)),
-    %if Result =:= not_found -> {"not found", RD, Ctx};
-    %  true -> {Result, RD, Ctx}
-    %end.
     case Result of
       not_found -> {"not_found", RD, Ctx};
       {ok, Bin} -> {binary_to_term(Bin), RD, Ctx};
       true -> {"error", RD, Ctx}
     end.
 
-%% hit this with
-%%   curl -X POST http://localhost:8000/formjson \
-%%        -d "one=two&me=pope"
 process_post(RD, Ctx) ->
     [{Key,Value}] = mochiweb_util:parse_qs(wrq:req_body(RD)),
     [{bc, Bitcask}] = ets:lookup(my_table, bc),
