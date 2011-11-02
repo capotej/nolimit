@@ -14,10 +14,17 @@
 -include_lib("webmachine/include/webmachine.hrl").
 -include_lib("bitcask/include/bitcask.hrl").
 
-init(Config) -> 
+start_bitcask() ->
   Bitcask = bitcask:open("/tmp", [read_write]),
+  receive 
+    {write, Key, Value} ->
+      bitcask:put(Bitcask, term_to_binary(Key), term_to_binary(Value))
+  end.
+
+init(Config) -> 
+  Bpid = spawn(nolimit_resource, start_bitcask, []).
   ets:new(my_table, [named_table, protected, set, {keypos, 1}]),
-  ets:insert(my_table, {bc, Bitcask}),
+  ets:insert(my_table, {bc, Bpid}),
   %ets:lookup(my_table, foo). -> [{bc,"Bar"}]
   {ok, Config}.
 
@@ -40,6 +47,7 @@ to_json(RD, Ctx) ->
 process_post(RD, Ctx) ->
     [{Key,Value}] = mochiweb_util:parse_qs(wrq:req_body(RD)),
     [{bc, Bitcask}] = ets:lookup(my_table, bc),
-    bitcask:put(Bitcask, term_to_binary(Key), term_to_binary(Value)),
+    Bitcask ! {write, Key, VAlue}
+    %bitcask:put(Bitcask, term_to_binary(Key), term_to_binary(Value)),
     {true, wrq:append_to_response_body("ok", RD), Ctx}.
 
