@@ -1,0 +1,18 @@
+%%-*- mode: erlang -*-
+{application, nolimit,
+ [
+  {description, "nolimit"},
+  {vsn, "1"},
+  {modules, []},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  inets,
+                  crypto,
+                  mochiweb,
+                  webmachine
+                 ]},
+  {mod, { nolimit_app, []}},
+  {env, []}
+ ]}.
