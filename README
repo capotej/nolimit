@@ -2,6 +2,11 @@ NoLimit
 
 webmachine/bitcask proof of concept for a disk backed, fast k/v cache
 
+DISCLAIMER: I am not an erlang programmer (though I'd like to be), so this code has tons of mistakes, feel free to clown me out.
+
+TODO: 
+* Make it support more than a single write at a time (perhaps by putting bitcask behind a process?)
+
 INSTALL:
 
 0) brew install erlang
