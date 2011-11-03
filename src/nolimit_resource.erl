@@ -5,6 +5,7 @@
 -module(nolimit_resource).
 -export([
     init/1, 
+    start_bitcask/0,
     process_post/2,
     allowed_methods/2,
     content_types_provided/2,
@@ -15,17 +16,22 @@
 -include_lib("bitcask/include/bitcask.hrl").
 
 start_bitcask() ->
-  Bitcask = bitcask:open("/tmp", [read_write]),
-  receive 
+  receive
     {write, Key, Value} ->
-      bitcask:put(Bitcask, term_to_binary(Key), term_to_binary(Value))
+      Bitcask = bitcask:open("/tmp/loli", [read_write]),
+      bitcask:put(Bitcask, term_to_binary(Key), term_to_binary(Value)),
+      bitcask:close(Bitcask),
+      start_bitcask();
+    _ ->
+      start_bitcask()
   end.
 
 init(Config) -> 
-  Bpid = spawn(nolimit_resource, start_bitcask, []).
+  Bitcask = bitcask:open("/tmp/loli"),
   ets:new(my_table, [named_table, protected, set, {keypos, 1}]),
-  ets:insert(my_table, {bc, Bpid}),
-  %ets:lookup(my_table, foo). -> [{bc,"Bar"}]
+  ets:insert(my_table, {bc, Bitcask}),
+  Bc = spawn(nolimit_resource, start_bitcask, []),
+  ets:insert(my_table, {bcpid, Bc}),
   {ok, Config}.
 
 allowed_methods(RD, Ctx) ->
@@ -36,7 +42,7 @@ content_types_provided(RD, Ctx) ->
 
 to_json(RD, Ctx) ->
     [{"key",Key}] = wrq:req_qs(RD),
-    [{bc, Bitcask}] = ets:lookup(my_table, bc),
+    [{bc, Bitcask}] = ets:lookup(my_table, bc),   
     Result = bitcask:get(Bitcask, term_to_binary(Key)),
     case Result of
       not_found -> {"not_found", RD, Ctx};
@@ -46,8 +52,7 @@ to_json(RD, Ctx) ->
 
 process_post(RD, Ctx) ->
     [{Key,Value}] = mochiweb_util:parse_qs(wrq:req_body(RD)),
-    [{bc, Bitcask}] = ets:lookup(my_table, bc),
-    Bitcask ! {write, Key, VAlue}
-    %bitcask:put(Bitcask, term_to_binary(Key), term_to_binary(Value)),
+    [{bcpid, Bitcask}] = ets:lookup(my_table, bcpid),
+    Bitcask ! {write, Key, Value},
     {true, wrq:append_to_response_body("ok", RD), Ctx}.
 
