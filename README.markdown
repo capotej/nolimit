@@ -10,7 +10,10 @@
 
 ##installation
 
-1. ```git clone git://github.com:capotej/nolimit.git```
+1. 
+```
+git clone git://github.com:capotej/nolimit.git
+```
 
 1. ```cd nolimit```
 
