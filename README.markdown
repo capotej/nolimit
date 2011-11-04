@@ -9,17 +9,12 @@
 * erlang, at least 13B04
 
 ##installation
-
-1. 
 ```
-git clone git://github.com:capotej/nolimit.git
+$ git clone git://github.com:capotej/nolimit.git
+$ cd nolimit
+$ make
+$ ./start.sh
 ```
-
-1. ```cd nolimit```
-
-1. ```make```
-
-1. ```./start.sh```
 
 ##usage
 
@@ -29,11 +24,12 @@ git clone git://github.com:capotej/nolimit.git
 * Getting keys
      - ```curl http://localhost:8000/?key=foo```
 
-##testing/benchmarks
+##testing/benchmarks (just needs ruby and curl)
 
-1. ```./start.sh```
-
-1. ```ruby misc/readwrite.rb```
+```
+./start.sh
+ruby misc/readwrite.rb
+```
 
 
 ##todo
