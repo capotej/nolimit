@@ -22,6 +22,9 @@ wait() ->
       wait()
   end.
 
+thing() ->
+  io:format("asD").
+
 
 write_proc(Ref) ->
   receive

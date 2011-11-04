@@ -43,6 +43,7 @@ upgrade() ->
 init([]) ->
     ets:new(my_table, [named_table, protected, set, {keypos, 1}]),
     Writer = nolimit_writer:start_writer(),
+    timer:send_interval(10000, Writer, {merge}),
     ets:insert(my_table, {writer, Writer}),
     Ip = case os:getenv("WEBMACHINE_IP") of false -> "0.0.0.0"; Any -> Any end,
     {ok, Dispatch} = file:consult(filename:join(

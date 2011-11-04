@@ -4,7 +4,8 @@ webmachine/bitcask proof of concept for a disk backed, fast k/v cache
 
 TODO: 
 
-* merging?
+* configurable merge (x requests or every x seconds)
+* delete key
 
 DISCLAIMER:
 
