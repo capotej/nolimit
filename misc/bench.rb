@@ -10,6 +10,8 @@ st = Time.now
   key = "#{Time.now.to_f.to_s}#{rand(1000)}"
   r = `curl -X POST http://localhost:8000/ -d "#{key}=#{value}"`
   puts "#{i} = #{key} = #{r}"
+  r = `curl http://localhost:8000/?key=#{key}`
+  p r
   #response = Typhoeus::Request.post("http://localhost:8000/", :params => {key => value })
 end
 et = Time.now

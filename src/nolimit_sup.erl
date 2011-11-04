@@ -41,6 +41,9 @@ upgrade() ->
 %% @spec init([]) -> SupervisorTree
 %% @doc supervisor callback.
 init([]) ->
+    ets:new(my_table, [named_table, protected, set, {keypos, 1}]),
+    Writer = nolimit_writer:start_writer(),
+    ets:insert(my_table, {writer, Writer}),
     Ip = case os:getenv("WEBMACHINE_IP") of false -> "0.0.0.0"; Any -> Any end,
     {ok, Dispatch} = file:consult(filename:join(
                          [filename:dirname(code:which(?MODULE)),
