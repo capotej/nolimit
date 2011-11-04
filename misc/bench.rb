@@ -12,7 +12,6 @@ st = Time.now
   puts "#{i} = #{key} = #{r}"
   r = `curl http://localhost:8000/?key=#{key}`
   p r
-  sleep 1
   #response = Typhoeus::Request.post("http://localhost:8000/", :params => {key => value })
 end
 et = Time.now
