@@ -2,6 +2,14 @@ NoLimit
 
 webmachine/bitcask proof of concept for a disk backed, fast k/v cache
 
+TODO: 
+
+* merging?
+
+DISCLAIMER:
+
+i am not an erlang programmer, critique is welcome and encouraged
+
 
 INSTALL:
 
