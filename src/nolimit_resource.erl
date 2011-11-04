@@ -3,35 +3,29 @@
 %% @doc No Limit Resource
 
 -module(nolimit_resource).
--export([
-    init/1, 
-    start_bitcask/0,
-    process_post/2,
-    allowed_methods/2,
-    content_types_provided/2,
-    to_json/2
-  ]).
+-compile(export_all).
 
 -include_lib("webmachine/include/webmachine.hrl").
 -include_lib("bitcask/include/bitcask.hrl").
 
-start_bitcask() ->
+start_writer() ->
+    Pid = spawn_link(fun() ->
+          Ref = bitcask:open("nolimit.cask", [read_write]),
+          nolimit_resource:write_proc(Ref)
+      end),
+    Pid.
+
+write_proc(Ref) ->
   receive
     {write, Key, Value} ->
-      Bitcask = bitcask:open("/tmp/loli", [read_write]),
-      bitcask:put(Bitcask, term_to_binary(Key), term_to_binary(Value)),
-      bitcask:close(Bitcask),
-      start_bitcask();
-    _ ->
-      start_bitcask()
+      bitcask:put(Ref, term_to_binary(Key), term_to_binary(Value)),
+      nolimit_resource:write_proc(Ref)
   end.
 
+
 init(Config) -> 
-  Bitcask = bitcask:open("/tmp/loli"),
-  ets:new(my_table, [named_table, protected, set, {keypos, 1}]),
-  ets:insert(my_table, {bc, Bitcask}),
-  Bc = spawn(nolimit_resource, start_bitcask, []),
-  ets:insert(my_table, {bcpid, Bc}),
+  Writer = start_writer(),
+  put(writer, Writer),
   {ok, Config}.
 
 allowed_methods(RD, Ctx) ->
@@ -42,8 +36,9 @@ content_types_provided(RD, Ctx) ->
 
 to_json(RD, Ctx) ->
     [{"key",Key}] = wrq:req_qs(RD),
-    [{bc, Bitcask}] = ets:lookup(my_table, bc),   
+    Bitcask = bitcask:open("nolimit.cask"),
     Result = bitcask:get(Bitcask, term_to_binary(Key)),
+    bitcask:close(Bitcask),
     case Result of
       not_found -> {"not_found", RD, Ctx};
       {ok, Bin} -> {binary_to_term(Bin), RD, Ctx};
@@ -52,7 +47,7 @@ to_json(RD, Ctx) ->
 
 process_post(RD, Ctx) ->
     [{Key,Value}] = mochiweb_util:parse_qs(wrq:req_body(RD)),
-    [{bcpid, Bitcask}] = ets:lookup(my_table, bcpid),
-    Bitcask ! {write, Key, Value},
+    Writer = get(writer),
+    Writer ! {write, Key, Value},
     {true, wrq:append_to_response_body("ok", RD), Ctx}.
 

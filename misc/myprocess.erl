@@ -35,7 +35,7 @@ write_proc(Ref) ->
 
 
 
-
+%### ERL_LIBS=/Users/capotej/nolimit/deps/bitcask erl
 %32> A = myprocess:start_writer().
 %<0.97.0>
 %33> A ! {write, "1", "2"}.
