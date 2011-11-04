@@ -2,8 +2,13 @@
 
 ![logo](http://upload.wikimedia.org/wikipedia/en/2/23/Nolimit.jpg)
 
+###a disk backed, k/v cache accessible via http (webmachine/bitcask)
 
-###a disk backed k/v cache accessible via http (webmachine/bitcask)
+##rationale
+The two main k/v caches (memcache and redis) require that you keep the
+entire working set in memory. Bitcask only requires the keys be in
+memory, making it perfect for a persistent cache of large datasets.
+
 
 ##dependencies
 * erlang, at least 13B04
@@ -30,7 +35,6 @@ $ ./start.sh
 $ ./start.sh
 $ ruby misc/readwrite.rb
 ```
-
 
 ##todo
 
