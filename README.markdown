@@ -27,8 +27,8 @@ $ ./start.sh
 ##testing/benchmarks (just needs ruby and curl)
 
 ```
-./start.sh
-ruby misc/readwrite.rb
+$ ./start.sh
+$ ruby misc/readwrite.rb
 ```
 
 
