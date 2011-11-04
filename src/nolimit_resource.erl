@@ -8,24 +8,7 @@
 -include_lib("webmachine/include/webmachine.hrl").
 -include_lib("bitcask/include/bitcask.hrl").
 
-start_writer() ->
-    Pid = spawn_link(fun() ->
-          Ref = bitcask:open("nolimit.cask", [read_write]),
-          nolimit_resource:write_proc(Ref)
-      end),
-    Pid.
-
-write_proc(Ref) ->
-  receive
-    {write, Key, Value} ->
-      bitcask:put(Ref, term_to_binary(Key), term_to_binary(Value)),
-      nolimit_resource:write_proc(Ref)
-  end.
-
-
 init(Config) -> 
-  Writer = start_writer(),
-  put(writer, Writer),
   {ok, Config}.
 
 allowed_methods(RD, Ctx) ->
@@ -40,14 +23,14 @@ to_json(RD, Ctx) ->
     Result = bitcask:get(Bitcask, term_to_binary(Key)),
     bitcask:close(Bitcask),
     case Result of
-      not_found -> {"not_found", RD, Ctx};
+      not_found -> {"not found", RD, Ctx};
       {ok, Bin} -> {binary_to_term(Bin), RD, Ctx};
       true -> {"error", RD, Ctx}
     end.
 
 process_post(RD, Ctx) ->
     [{Key,Value}] = mochiweb_util:parse_qs(wrq:req_body(RD)),
-    Writer = get(writer),
+    [{writer, Writer}] = ets:lookup(my_table, writer),
     Writer ! {write, Key, Value},
     {true, wrq:append_to_response_body("ok", RD), Ctx}.
 
