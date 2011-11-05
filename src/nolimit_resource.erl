@@ -30,7 +30,6 @@ to_json(RD, Ctx) ->
 
 process_post(RD, Ctx) ->
     [{Key,Value}] = mochiweb_util:parse_qs(wrq:req_body(RD)),
-    [{writer, Writer}] = ets:lookup(my_table, writer),
-    Writer ! {write, Key, Value},
+    writer ! {write, Key, Value},
     {true, wrq:append_to_response_body("ok", RD), Ctx}.
 
