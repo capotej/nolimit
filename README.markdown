@@ -38,6 +38,12 @@ $ ./start.sh
     
      - ```← { "foo1": "bar1", "foo2": "bar2" }```
 
+* TTL Support (expires on next read after expire time)
+     - ```→ curl -X POST http://localhost:8000/ -d "foo=bar" -d "ttl=300"```
+
+     - ```← ok```
+
+
 ##testing (just needs ruby and curl)
 
 ```
