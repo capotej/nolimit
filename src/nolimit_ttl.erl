@@ -15,7 +15,7 @@ get(Bitcask, StrKey) ->
         Ttl == 0 ->
           {ok, Value};
         (Ttl + Time) < Now ->
-          bitcask:delete(Bitcask, Key),
+          writer ! {delete, StrKey},
           not_found;
         true ->
           {ok, Value}

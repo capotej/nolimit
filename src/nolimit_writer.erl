@@ -8,8 +8,12 @@ write_proc(Ref) ->
     {write, Key, Value} ->
       bitcask:put(Ref, term_to_binary(Key), term_to_binary([Value, 0, nolimit_ttl:epoch_seconds()])),
       nolimit_writer:write_proc(Ref);
-    {write, Key, Value, Seconds} ->
-      bitcask:put(Ref, term_to_binary(Key), term_to_binary([Value, string:to_integer(Seconds), nolimit_ttl:epoch_seconds()])),
+    {write, Key, Value, RawSeconds} ->
+      {Seconds, _} = string:to_integer(RawSeconds),
+      bitcask:put(Ref, term_to_binary(Key), term_to_binary([Value, Seconds, nolimit_ttl:epoch_seconds()])),
+      nolimit_writer:write_proc(Ref);
+    {delete, Key} ->
+      bitcask:delete(Ref, term_to_binary(Key)),
       nolimit_writer:write_proc(Ref)
   end.
 
