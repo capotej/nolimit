@@ -31,7 +31,7 @@ with_missing(Keys) ->
 
 % only return the results that were found
 without_missing(Keys) ->
-  Results = fetch(Keys),
+  Results = with_missing(Keys),
   lists:filter(fun(Result) -> 
       case Result of
         {_, not_found} -> false;

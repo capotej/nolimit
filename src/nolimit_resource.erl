@@ -24,14 +24,23 @@ finish_request(RD, Ctx) ->
   bitcask:close(Ctx#context.bc).
 
 to_json(RD, Ctx) ->
+  case wrq:req_qs(RD) of
+      [{"key", Key}] -> single_get(Key, RD, Ctx);
+      [{"keys", Keys}] -> multi_get(Keys, RD, Ctx)
+  end.
+
+single_get(Key, RD, Ctx) ->
   Bitcask = Ctx#context.bc,
-  [{"key",Key}] = wrq:req_qs(RD),
   Result = bitcask:get(Bitcask, term_to_binary(Key)),
   case Result of
     not_found -> {"not found", RD, Ctx};
     {ok, Bin} -> {binary_to_term(Bin), RD, Ctx};
     true -> {"error", RD, Ctx}
   end.
+
+
+multi_get(Keys, RD, Ctx) ->
+  ok.
 
 process_post(RD, Ctx) ->
   [{Key,Value}] = mochiweb_util:parse_qs(wrq:req_body(RD)),
