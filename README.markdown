@@ -24,14 +24,19 @@ $ ./start.sh
 ##usage
 
 * Setting keys
-     - ```curl -X POST http://localhost:8000/ -d "foo=bar"```
+     - ```→ curl -X POST http://localhost:8000/ -d "foo=bar"```
+
+     - ```← ok```
 
 * Getting keys
-     - ```curl http://localhost:8000/?key=foo```
+     - ```→ curl http://localhost:8000/?key=foo```
 
-* Multi Get
-     - ```curl http://localhost:8000/?keys=foo1,foo2```
+     - ```← bar```
 
+* Multi Get (executed concurrently on the server)
+     - ```→ curl http://localhost:8000/?keys=foo1,foo2```
+    
+     - ```← { "foo1": "bar1", "foo2": "bar2" }```
 
 ##testing (just needs ruby and curl)
 
