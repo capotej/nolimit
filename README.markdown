@@ -29,6 +29,10 @@ $ ./start.sh
 * Getting keys
      - ```curl http://localhost:8000/?key=foo```
 
+* Multi Get
+     - ```curl http://localhost:8000/?keys=foo1,foo2```
+
+
 ##testing (just needs ruby and curl)
 
 ```
