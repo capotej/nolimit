@@ -25,8 +25,8 @@ finish_request(RD, Ctx) ->
 
 to_json(RD, Ctx) ->
   case wrq:req_qs(RD) of
-      [{"key", Key}] -> single_get(Key, RD, Ctx);
-      [{"keys", RawKeys}] -> multi_get(RawKeys, RD, Ctx)
+    [{"key", Key}] -> single_get(Key, RD, Ctx);
+    [{"keys", RawKeys}] -> multi_get(RawKeys, RD, Ctx)
   end.
 
 single_get(Key, RD, Ctx) ->
@@ -38,6 +38,8 @@ single_get(Key, RD, Ctx) ->
     true -> {"error", RD, Ctx}
   end.
 
+epoch_seconds() ->
+  calendar:datetime_to_gregorian_seconds(calendar:now_to_universal_time( now()))-719528*24*3600.
 
 multi_get(RawKeys, RD, Ctx) ->
   Keys = string:tokens(RawKeys, ","),
@@ -46,7 +48,9 @@ multi_get(RawKeys, RD, Ctx) ->
   {Json, RD, Ctx}.
 
 process_post(RD, Ctx) ->
-  [{Key,Value}] = mochiweb_util:parse_qs(wrq:req_body(RD)),
-  writer ! {write, Key, Value},
+  case mochiweb_util:parse_qs(wrq:req_body(RD)) of
+    [{Key,Value}] ->  writer ! {write, Key, Value};
+    [{Key,Value}, {"ttl", Seconds}] -> writer ! {write, Key, Value, Seconds}
+  end,
   {true, wrq:append_to_response_body("ok", RD), Ctx}.
 
