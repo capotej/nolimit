@@ -26,7 +26,7 @@ finish_request(RD, Ctx) ->
 to_json(RD, Ctx) ->
   case wrq:req_qs(RD) of
       [{"key", Key}] -> single_get(Key, RD, Ctx);
-      [{"keys", Keys}] -> multi_get(Keys, RD, Ctx)
+      [{"keys", RawKeys}] -> multi_get(RawKeys, RD, Ctx)
   end.
 
 single_get(Key, RD, Ctx) ->
@@ -39,8 +39,11 @@ single_get(Key, RD, Ctx) ->
   end.
 
 
-multi_get(Keys, RD, Ctx) ->
-  ok.
+multi_get(RawKeys, RD, Ctx) ->
+  Keys = string:tokens(RawKeys, ","),
+  Result = {struct, nolimit_multiget:without_missing(Keys)},
+  Json = binary:bin_to_list(iolist_to_binary(mochijson2:encode(Result))),
+  {Json, RD, Ctx}.
 
 process_post(RD, Ctx) ->
   [{Key,Value}] = mochiweb_util:parse_qs(wrq:req_body(RD)),
