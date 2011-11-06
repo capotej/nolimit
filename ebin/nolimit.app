@@ -2,7 +2,7 @@
              [{description,"nolimit"},
               {vsn,"1"},
               {modules,[nolimit,nolimit_app,nolimit_multiget,nolimit_resource,
-                        nolimit_sup,nolimit_writer]},
+                        nolimit_sup,nolimit_ttl,nolimit_writer]},
               {registered,[]},
               {applications,[kernel,stdlib,inets,crypto,mochiweb,webmachine]},
               {mod,{nolimit_app,[]}},

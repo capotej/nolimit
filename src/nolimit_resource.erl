@@ -31,15 +31,12 @@ to_json(RD, Ctx) ->
 
 single_get(Key, RD, Ctx) ->
   Bitcask = Ctx#context.bc,
-  Result = bitcask:get(Bitcask, term_to_binary(Key)),
+  Result = nolimit_ttl:get(Bitcask, Key),
   case Result of
     not_found -> {"not found", RD, Ctx};
-    {ok, Bin} -> {binary_to_term(Bin), RD, Ctx};
+    {ok, Value} -> {Value, RD, Ctx};
     true -> {"error", RD, Ctx}
   end.
-
-epoch_seconds() ->
-  calendar:datetime_to_gregorian_seconds(calendar:now_to_universal_time( now()))-719528*24*3600.
 
 multi_get(RawKeys, RD, Ctx) ->
   Keys = string:tokens(RawKeys, ","),
