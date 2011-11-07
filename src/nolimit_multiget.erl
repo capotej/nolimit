@@ -21,8 +21,8 @@ wait_result({Pid,Ref}) ->
 with_missing(Keys) ->
     pmap(fun(Key) -> 
         Bitcask = bitcask:open("nolimit.cask"),
-        Result = case bitcask:get(Bitcask, term_to_binary(Key)) of
-          {ok, Bin} -> {Key, binary:list_to_bin(binary_to_term(Bin))};
+        Result = case nolimit_ttl:get(Bitcask, Key) of
+          {ok, Bin} -> {Key, binary:list_to_bin(Bin)};
           _ -> {Key, not_found} 
         end,
         bitcask:close(Bitcask),

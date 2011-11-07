@@ -27,7 +27,8 @@ class NoLimitTest < Test::Unit::TestCase
       `curl -X POST http://localhost:8000 -d "test#{i}=asdf"`
     end
     result = `curl http://localhost:8000/?keys=test0,test1,test2,test3,test4,test5,test6,test7,test8,test9`
-    p result
+    expected = "{\"test0\":\"asdf\",\"test1\":\"asdf\",\"test2\":\"asdf\",\"test3\":\"asdf\",\"test4\":\"asdf\",\"test5\":\"asdf\",\"test6\":\"asdf\",\"test7\":\"asdf\",\"test8\":\"asdf\",\"test9\":\"asdf\"}" 
+    assert_equal result, expected 
   end
 
 end
