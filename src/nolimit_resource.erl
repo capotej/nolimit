@@ -24,6 +24,26 @@ finish_request(RD, Ctx) ->
   bitcask:close(Ctx#context.bc),
   {true, RD, Ctx}.
 
+resource_exists(RD, Ctx) ->
+  case wrq:req_qs(RD) of
+    [{"key", Key}] -> 
+      Bitcask = Ctx#context.bc,
+      Result = nolimit_ttl:get(Bitcask, Key),
+      case Result of
+        not_found -> 
+          {false, RD, Ctx};
+        {ok, Value} -> 
+          Ctx1 = Ctx#context{value=Value},
+          {true, RD, Ctx1};
+        true -> {false, RD, Ctx}
+      end;
+    [{"keys",_}] -> 
+      {true, RD, Ctx};
+    _ ->
+      {true, RD, Ctx}
+  end.
+
+
 to_json(RD, Ctx) ->
   case wrq:req_qs(RD) of
     [{"key", Key}] -> single_get(Key, RD, Ctx);
@@ -36,13 +56,7 @@ delete_resource(RD, Ctx) ->
   {true, RD, Ctx}.
 
 single_get(Key, RD, Ctx) ->
-  Bitcask = Ctx#context.bc,
-  Result = nolimit_ttl:get(Bitcask, Key),
-  case Result of
-    not_found -> {"not found", RD, Ctx};
-    {ok, Value} -> {Value, RD, Ctx};
-    true -> {"error", RD, Ctx}
-  end.
+  {Ctx#context.value, RD, Ctx}.
 
 multi_get(RawKeys, RD, Ctx) ->
   Keys = string:tokens(RawKeys, ","),
