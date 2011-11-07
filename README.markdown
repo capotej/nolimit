@@ -23,15 +23,21 @@ $ ./start.sh
 
 ##usage
 
-* Setting keys
+* Setting a key
      - ```→ curl -X POST http://localhost:8000/ -d "foo=bar"```
 
      - ```← ok```
 
-* Getting keys
+* Getting a key
      - ```→ curl http://localhost:8000/?key=foo```
 
      - ```← bar```
+
+* Delete a key
+     - ```→ curl -X DELETE http://localhost:8000/?key=foo```
+
+     - ```← (204 No content)```
+
 
 * Multi Get (executed concurrently on the server)
      - ```→ curl http://localhost:8000/?keys=foo1,foo2```

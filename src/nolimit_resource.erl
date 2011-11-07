@@ -15,7 +15,7 @@ init(_) ->
   {ok, Ctx}.
 
 allowed_methods(RD, Ctx) ->
-  {['GET', 'HEAD', 'POST'], RD, Ctx}.
+  {['GET', 'HEAD', 'POST', 'DELETE'], RD, Ctx}.
 
 content_types_provided(RD, Ctx) ->
   {[{"application/json", to_json}], RD, Ctx}.
@@ -29,6 +29,11 @@ to_json(RD, Ctx) ->
     [{"key", Key}] -> single_get(Key, RD, Ctx);
     [{"keys", RawKeys}] -> multi_get(RawKeys, RD, Ctx)
   end.
+
+delete_resource(RD, Ctx) ->
+  [{"key", Key}] = wrq:req_qs(RD),
+  writer ! {delete, Key},
+  {true, RD, Ctx}.
 
 single_get(Key, RD, Ctx) ->
   Bitcask = Ctx#context.bc,
