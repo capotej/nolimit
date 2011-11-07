@@ -41,7 +41,7 @@ $ ./start.sh
 
 * Multi Get (executed concurrently on the server)
      - ```→ curl http://localhost:8000/?keys=foo1,foo2```
-    
+
      - ```← { "foo1": "bar1", "foo2": "bar2" }```
 
 * TTL Support (expires on next read after expire time)
@@ -50,37 +50,10 @@ $ ./start.sh
      - ```← ok```
 
 
-##testing (just needs ruby and curl)
-
-```
-$ ./start.sh
-$ ruby misc/readwrite.rb
-```
-
-##benchmarks
-* reads
-```
-$ siege -t 1m -b http://localhost:8000/\?key\=foo
-
-Transactions:		       82873 hits
-Availability:		      100.00 %
-Elapsed time:		       59.02 secs
-Data transferred:	        0.24 MB
-Response time:		        0.01 secs
-Transaction rate:	     1404.15 trans/sec
-Throughput:		        0.00 MB/sec
-Concurrency:		       13.82
-Successful transactions:       82888
-Failed transactions:	           0
-Longest transaction:	        0.43
-Shortest transaction:	        0.00
-```
-
 ##todo
 
 * figure out when to merge
 * use otp to monitor the bitcask writer
-* delete keys
 
 ##license
 Copyright (C) 2011 by Julio Capote
