@@ -21,7 +21,8 @@ content_types_provided(RD, Ctx) ->
   {[{"application/json", to_json}], RD, Ctx}.
 
 finish_request(RD, Ctx) ->
-  bitcask:close(Ctx#context.bc).
+  bitcask:close(Ctx#context.bc),
+  {true, RD, Ctx}.
 
 to_json(RD, Ctx) ->
   case wrq:req_qs(RD) of
