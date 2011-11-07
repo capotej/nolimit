@@ -31,4 +31,11 @@ class NoLimitTest < Test::Unit::TestCase
     assert_equal result, expected 
   end
 
+  def test_ttl
+    `curl -X POST http://localhost:8000 -d "expire_test=1234" -d "ttl=1"`
+    sleep 2
+    result = `curl http://localhost:8000/?key=expire_test`
+    assert_equal result, "not found"
+  end
+
 end
