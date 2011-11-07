@@ -26,29 +26,34 @@ $ ./start.sh
 * Setting a key
      - ```→ curl -X POST http://localhost:8000/ -d "foo=bar"```
 
-     - ```← ok```
+     - ```← [200] ok```
 
 * Getting a key
      - ```→ curl http://localhost:8000/?key=foo```
 
-     - ```← bar```
+     - ```← [200] bar```
 
 * Delete a key
      - ```→ curl -X DELETE http://localhost:8000/?key=foo```
 
-     - ```← (204 No content)```
+     - ```← [204]```
 
 
 * Multi Get (executed concurrently on the server)
      - ```→ curl http://localhost:8000/?keys=foo1,foo2```
 
-     - ```← { "foo1": "bar1", "foo2": "bar2" }```
+     - ```← [200] { "foo1": "bar1", "foo2": "bar2" }```
 
 * TTL Support (expires on next read after expire time)
      - ```→ curl -X POST http://localhost:8000/ -d "foo=bar" -d "ttl=300"```
 
-     - ```← ok```
+     - ```← [200] ok```
 
+* Missing keys
+
+     - ```→ curl http://localhost:8000/?key=missing_or_expired_key```
+
+     - ```← [404] not found```
 
 ##testing (only uses system ruby and curl command)
 ```
