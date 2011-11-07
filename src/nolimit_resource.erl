@@ -31,7 +31,8 @@ resource_exists(RD, Ctx) ->
       Result = nolimit_ttl:get(Bitcask, Key),
       case Result of
         not_found -> 
-          {false, RD, Ctx};
+          RD1 = wrq:set_resp_body(<<"not found">>, RD),
+          {false, RD1, Ctx};
         {ok, Value} -> 
           Ctx1 = Ctx#context{value=Value},
           {true, RD, Ctx1};
