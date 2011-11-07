@@ -50,6 +50,12 @@ $ ./start.sh
      - ```← ok```
 
 
+##testing (only uses system ruby and curl command)
+```
+$ ./start.sh
+$ ruby misc/test.rb
+```
+
 ##todo
 
 * figure out when to merge
