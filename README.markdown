@@ -64,7 +64,7 @@ $ ruby misc/test.rb
 ##todo
 
 * figure out when to merge
-* use otp to monitor the bitcask writer
+* give the bitcask writer its own supervisor
 
 ##license
 Copyright (C) 2011 by Julio Capote
