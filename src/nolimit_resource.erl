@@ -18,7 +18,12 @@ allowed_methods(RD, Ctx) ->
   {['GET', 'HEAD', 'POST', 'DELETE'], RD, Ctx}.
 
 content_types_provided(RD, Ctx) ->
-  {[{"application/json", to_json}], RD, Ctx}.
+  case wrq:req_qs(RD) of
+    [{"keys", _}] ->
+      {[{"application/json", render}], RD, Ctx};
+    _ ->
+      {[{"text/plain", render}], RD, Ctx}
+  end.
 
 finish_request(RD, Ctx) ->
   bitcask:close(Ctx#context.bc),
@@ -44,8 +49,7 @@ resource_exists(RD, Ctx) ->
       {true, RD, Ctx}
   end.
 
-
-to_json(RD, Ctx) ->
+render(RD, Ctx) ->
   case wrq:req_qs(RD) of
     [{"key", Key}] -> single_get(Key, RD, Ctx);
     [{"keys", RawKeys}] -> multi_get(RawKeys, RD, Ctx)
@@ -56,7 +60,7 @@ delete_resource(RD, Ctx) ->
   writer ! {delete, Key},
   {true, RD, Ctx}.
 
-single_get(Key, RD, Ctx) ->
+single_get(_Key, RD, Ctx) ->
   {Ctx#context.value, RD, Ctx}.
 
 multi_get(RawKeys, RD, Ctx) ->
